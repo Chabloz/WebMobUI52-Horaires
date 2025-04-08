@@ -1,38 +1,54 @@
 <script setup>
 import { ref, computed, watchEffect, nextTick } from 'vue';
 import scheduleIm from '@/data/scheduleIm.json';
+import TheClassesSelectors from '@/components/TheClassesSelectors.vue';
+import TheSearchInput from '@/components/TheSearchInput.vue';
+import ScheduleItem from '@/components/ScheduleItem.vue';
 
 const search = ref('');
+const selectedClasses = ref([]);
 
 const schedule = ref(scheduleIm);
+
 const scheduleSorted = computed(() => {
   return schedule.value.sort((a, b) => new Date(a.start) - new Date(b.start));
 });
-const scheduleSortedAndAfterNow = computed(() => {
+
+const scheduleAfter = computed(() => {
   return scheduleSorted.value.filter(
     entry => new Date(entry.end) >= new Date()
   );
 });
 
-const scheduleSortedAndAfterNowAndSearch = computed(() => {
-  if (search.value === '') {
-    return scheduleSortedAndAfterNow.value;
+const scheduleFiltered = computed(() => {
+  let filtered = scheduleAfter.value;
+  if (selectedClasses.value.length > 0) {
+    filtered = scheduleAfter.value.filter(entry => {
+      return selectedClasses.value.includes(entry.class);
+    });
   }
-  return scheduleSortedAndAfterNow.value.filter(entry => {
-    return entry.label.toLowerCase().includes(search.value.toLowerCase());
-  });
+  if (search.value) {
+    filtered = filtered.filter(entry => {
+      return entry.label.toLowerCase().includes(search.value.toLowerCase());
+    });
+  }
+  return filtered;
 });
+
 </script>
 
 <template>
-  <input type="search" placeholder="Search..." v-model="search">
-  <ul>
-    <li v-for="entry of scheduleSortedAndAfterNowAndSearch" :key="entry.id">
-      {{  entry.start }} - {{ entry.label }}
-    </li>
-  </ul>
+  <TheClassesSelectors
+    :schedule="schedule"
+    v-model="selectedClasses"
+  />
+  <TheSearchInput v-model="search" />
+
+  <q-list bordered separator>
+    <ScheduleItem
+      v-for="entry of scheduleFiltered"
+      :key="entry.id"
+      :entry="entry"
+    />
+  </q-list>
 </template>
-
-<style scoped>
-
-</style>
