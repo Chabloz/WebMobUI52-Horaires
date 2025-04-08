@@ -1,36 +1,52 @@
 <script setup>
-import { ref, computed, watchEffect, nextTick } from 'vue';
-import scheduleIm from '@/data/scheduleIm.json';
+  import { ref, computed } from 'vue';
+  import schedule from '@/data/scheduleIM.json';
 
-const search = ref('');
+  const scheduleRef = ref(schedule);
+  const search = ref('');
+  const showAll = ref(false);
 
-const schedule = ref(scheduleIm);
-const scheduleSorted = computed(() => {
-  return schedule.value.sort((a, b) => new Date(a.start) - new Date(b.start));
-});
-const scheduleSortedAndAfterNow = computed(() => {
-  return scheduleSorted.value.filter(
-    entry => new Date(entry.end) >= new Date()
-  );
-});
-
-const scheduleSortedAndAfterNowAndSearch = computed(() => {
-  if (search.value === '') {
-    return scheduleSortedAndAfterNow.value;
-  }
-  return scheduleSortedAndAfterNow.value.filter(entry => {
-    return entry.label.toLowerCase().includes(search.value.toLowerCase());
+  const scheduleSorted = computed(() => {
+    return scheduleRef.value.sort((a, b) => {
+      const startA = new Date(a.start).getTime();
+      const startB = new Date(b.start).getTime();
+      return startA - startB;
+    });
   });
-});
+
+  const scheduleAfterNow = computed(() => {
+    if (showAll.value) {
+      return scheduleSorted.value;
+    }
+    const now = new Date().getTime();
+    return scheduleSorted.value.filter(entry => {
+      const end = new Date(entry.end).getTime();
+      return end >= now;
+    });
+  });
+
+  const scheduleFiltered = computed(() => {
+    return scheduleAfterNow.value.filter(entry => {
+      const label = entry.label.toLowerCase();
+      const searchTerm = search.value.toLowerCase();
+      return label.includes(searchTerm);
+    });
+  });
+
+
 </script>
 
 <template>
-  <input type="search" placeholder="Search..." v-model="search">
+  Horaires
+  <input type="checkbox" v-model="showAll">
+  <input type="search" placeholder="Search" v-model="search">
+  {{ search }}
   <ul>
-    <li v-for="entry of scheduleSortedAndAfterNowAndSearch" :key="entry.id">
-      {{  entry.start }} - {{ entry.label }}
+    <li v-for="entry of scheduleFiltered" :key="entry.id">
+      {{ entry.start }} {{  entry.label }}
     </li>
   </ul>
+
 </template>
 
 <style scoped>
