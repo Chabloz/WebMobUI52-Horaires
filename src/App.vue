@@ -1,6 +1,7 @@
 <script setup>
   import TheHeader from '@/components/TheHeader.vue';
   import TheFooter from '@/components/TheFooter.vue';
+  import TheSchedule from '@/components/TheSchedule.vue';
 </script>
 
 <template>
@@ -9,7 +10,7 @@
 
     <q-page-container>
       <q-page padding>
-        Hello world
+        <TheSchedule />
       </q-page>
     </q-page-container>
 
