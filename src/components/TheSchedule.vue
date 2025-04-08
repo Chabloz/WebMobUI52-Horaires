@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watchEffect, nextTick } from 'vue';
+import scheduleIm from '@/data/scheduleIm.json';
 
 const search = ref('');
 
