@@ -1,57 +1,84 @@
 <script setup>
-  import { ref, computed, watch} from 'vue';
-  import schedule from '@/data/scheduleIM.json';
+  import { ref, computed, watchEffect, nextTick } from 'vue';
+  import TheClassesSelectors from '@/components/TheClassesSelectors.vue';
+  import TheSearchInput from '@/components/TheSearchInput.vue';
+  import NetworkError from '@/components/NetworkError.vue';
+  import ScheduleItem from '@/components/ScheduleItem.vue';
+  import { useJsonStorage } from '@/composables/useJsonStorage.js';
   import { useFetchJson } from '@/composables/useFetchJson.js';
 
-  const scheduleRef = ref(schedule);
-  const search = ref('');
-  const showAll = ref(false);
+  const {data: search} = useJsonStorage('searchTerm', '');
+  const {data: selectedClasses} = useJsonStorage('selectedClasses', []);
+  const {data: showHistory} = useJsonStorage('showHistory', false);
 
-
-  const {data, error, loading} = useFetchJson('/api/schedule/all');
+  const {data: schedule, error, loading, abort} = useFetchJson("/api/schedule/all");
 
   const scheduleSorted = computed(() => {
-    return scheduleRef.value.sort((a, b) => {
-      const startA = new Date(a.start).getTime();
-      const startB = new Date(b.start).getTime();
-      return startA - startB;
-    });
+    if (!schedule.value) return [];
+    return schedule.value.sort((a, b) => new Date(a.start) - new Date(b.start));
   });
 
-  const scheduleAfterNow = computed(() => {
-    if (showAll.value) {
-      return scheduleSorted.value;
-    }
-    const now = new Date().getTime();
-    return scheduleSorted.value.filter(entry => {
-      const end = new Date(entry.end).getTime();
-      return end >= now;
-    });
+  const scheduleAfter = computed(() => {
+    if (showHistory.value) return scheduleSorted.value;
+    const now = new Date();
+    return scheduleSorted.value.filter(entry => new Date(entry.end) >= now);
   });
 
   const scheduleFiltered = computed(() => {
-    return scheduleAfterNow.value.filter(entry => {
-      const label = entry.label.toLowerCase();
-      const searchTerm = search.value.toLowerCase();
-      return label.includes(searchTerm);
-    });
+    let filtered = scheduleAfter.value;
+    if (selectedClasses.value.length > 0) {
+      filtered = scheduleAfter.value.filter(entry => {
+        return selectedClasses.value.includes(entry.class);
+      });
+    }
+    if (search.value) {
+      filtered = filtered.filter(entry => {
+        return entry.label.toLowerCase().includes(search.value.toLowerCase());
+      });
+    }
+    return filtered;
   });
+
+  function resetAll() {
+    search.value = '';
+    selectedClasses.value = [];
+    showHistory.value = false;
+  }
+
+  function onSearchCourse(course) {
+    search.value = course;
+  }
 </script>
 
 <template>
-  <p v-if="error">{{  error }}</p>
-  <p v-if="loading">Chargement en cours....</p>
-  Horaires
-  <input type="checkbox" v-model="showAll">
-  <input type="search" placeholder="Search" v-model="search">
-  <ul>
-    <li v-for="entry of scheduleFiltered" :key="entry.id">
-      {{ entry.start }} {{  entry.label }}
-    </li>
-  </ul>
+  <div>
+    <q-inner-loading :showing="loading">
+      <q-spinner-gears size="50px" color="primary" />
+    </q-inner-loading>
 
+    <NetworkError v-if="error" />
+
+    <div v-if="schedule != null" class="q-pa-md">
+      <TheClassesSelectors
+        :schedule="schedule"
+        v-model="selectedClasses"
+      />
+
+      <div class="flex justify-between">
+        <q-checkbox v-model="showHistory" label="Afficher l'historique" dense/>
+        <q-btn @click="resetAll" icon="restart_alt" label="Vider les filtres" dense flat />
+      </div>
+
+      <TheSearchInput v-model="search" />
+
+      <q-list bordered separator class="q-mt-md">
+        <ScheduleItem
+          v-for="(entry, ind) of scheduleFiltered"
+          :key="entry.id"
+          :entry="entry"
+          @search-course="onSearchCourse"
+        />
+      </q-list>
+    </div>
+  </div>
 </template>
-
-<style scoped>
-
-</style>

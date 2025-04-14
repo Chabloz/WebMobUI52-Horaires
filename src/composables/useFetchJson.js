@@ -26,10 +26,8 @@ export function useFetchJson(options) {
   const { request, abort } = fetchJson(options);
   request
     .then(res => {
-      setTimeout(() => {
-        data.value = res;
-        loading.value = false;
-      }, 3000);
+      data.value = res;
+      loading.value = false;
     })
     .catch(err => {
       error.value = err;
