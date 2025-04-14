@@ -4,9 +4,11 @@ import scheduleIm from '@/data/scheduleIm.json';
 import TheClassesSelectors from '@/components/TheClassesSelectors.vue';
 import TheSearchInput from '@/components/TheSearchInput.vue';
 import ScheduleItem from '@/components/ScheduleItem.vue';
+import { useJsonStorage } from '@/composables/useJsonStorage.js';
 
-const search = ref('');
-const selectedClasses = ref([]);
+const {data: search} = useJsonStorage('searchTerm', '');
+const {data: selectedClasses} = useJsonStorage('selectedClasses', []);
+const {data: showHistory} = useJsonStorage('showHistory', false);
 
 const schedule = ref(scheduleIm);
 
@@ -15,9 +17,9 @@ const scheduleSorted = computed(() => {
 });
 
 const scheduleAfter = computed(() => {
-  return scheduleSorted.value.filter(
-    entry => new Date(entry.end) >= new Date()
-  );
+  if (showHistory.value) return scheduleSorted.value;
+  const now = new Date();
+  return scheduleSorted.value.filter(entry => new Date(entry.end) >= now);
 });
 
 const scheduleFiltered = computed(() => {
@@ -35,20 +37,33 @@ const scheduleFiltered = computed(() => {
   return filtered;
 });
 
+function resetAll() {
+  search.value = '';
+  selectedClasses.value = [];
+  showHistory.value = false;
+}
 </script>
 
 <template>
-  <TheClassesSelectors
-    :schedule="schedule"
-    v-model="selectedClasses"
-  />
-  <TheSearchInput v-model="search" />
-
-  <q-list bordered separator>
-    <ScheduleItem
-      v-for="entry of scheduleFiltered"
-      :key="entry.id"
-      :entry="entry"
+  <div>
+    <TheClassesSelectors
+      :schedule="schedule"
+      v-model="selectedClasses"
     />
-  </q-list>
+
+    <div class="flex justify-between">
+      <q-checkbox v-model="showHistory" label="Afficher l'historique" dense/>
+      <q-btn @click="resetAll" icon="restart_alt" label="Vider les filtres" dense flat />
+    </div>
+
+    <TheSearchInput v-model="search" />
+
+    <q-list bordered separator class="q-mt-md">
+      <ScheduleItem
+        v-for="entry of scheduleFiltered"
+        :key="entry.id"
+        :entry="entry"
+      />
+    </q-list>
+  </div>
 </template>

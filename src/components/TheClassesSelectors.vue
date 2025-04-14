@@ -8,14 +8,14 @@ const { schedule } = defineProps({
   }
 });
 
-const allClasses = computed(() => {
-  const classes = new Set(schedule.map(entry => entry.class));
-  return Array.from(classes).sort((a, b) => a.localeCompare(b));
-});
-
 const curClasses = defineModel({
   type: Array,
   default: []
+});
+
+const allClasses = computed(() => {
+  const classes = new Set(schedule.map(entry => entry.class));
+  return Array.from(classes).sort((a, b) => a.localeCompare(b));
 });
 
 function toggleClass(className) {
@@ -34,9 +34,16 @@ function toggleClass(className) {
       :key="className"
       :label="className"
       :color="curClasses.includes(className) ? 'primary' : 'secondary'"
-      class="q-ma-xs"
+      class="q-mr-sm q-mb-sm q-pr-sm q-pl-sm"
       dense
       @click="toggleClass(className)"
-    />
+    >
+      <q-icon
+        v-if="curClasses.includes(className)"
+        name="check"
+        class="q-mr-xs"
+        size="xs"
+      />
+    </q-btn>
   </div>
 </template>

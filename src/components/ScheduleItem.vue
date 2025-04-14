@@ -6,7 +6,6 @@
     }
   });
 
-  // Helper function to format the date as specified
   function formatDate(dateString) {
     const date = new Date(dateString);
     const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -17,7 +16,6 @@
     return `${dayOfWeek} ${day}.${month}`;
   }
 
-  // Helper function to format time (HH:MM)
   function formatTime(dateString) {
     const date = new Date(dateString);
     const hours = date.getHours().toString().padStart(2, '0');
@@ -29,22 +27,30 @@
 
 <template>
   <q-item>
-    <q-item-section top>
+    <q-item-section top class="col-2 column-divider">
       <div class="text-weight-bold">{{ formatDate(entry.start) }}</div>
     </q-item-section>
 
-    <q-item-section top class="content-width">
+    <q-item-section top class="col-2 column-divider">
       <div>{{ formatTime(entry.start) }}</div>
       <div>{{ formatTime(entry.end) }}</div>
     </q-item-section>
 
-    <q-item-section top>
+    <q-item-section top class="column-divider">
       <div>{{ entry.label }}</div>
       <div>{{ entry.class }}</div>
     </q-item-section>
 
-    <q-item-section top class="q-px-md">
+    <q-item-section top>
       {{ entry.room }}
     </q-item-section>
   </q-item>
 </template>
+
+<style scoped>
+.column-divider {
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  padding-right: 12px;
+  margin-right: 12px;
+}
+</style>
