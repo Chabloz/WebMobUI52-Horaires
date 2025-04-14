@@ -11,7 +11,7 @@
   const {data: selectedClasses} = useJsonStorage('selectedClasses', []);
   const {data: showHistory} = useJsonStorage('showHistory', false);
 
-  const {data: schedule, error, loading} = useFetchJson("/api/schedule/all");
+  const {data: schedule, error, loading, abort} = useFetchJson("/api/schedule/all");
 
   const scheduleSorted = computed(() => {
     if (!schedule.value) return [];
