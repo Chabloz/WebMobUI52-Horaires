@@ -1,8 +1,10 @@
 <script setup>
-  import { ref, computed } from 'vue';
-  import schedule from '@/data/scheduleIM.json';
+  import { ref, computed, watch} from 'vue';
+  // import schedule from '@/data/scheduleIM.json';
 
-  const scheduleRef = ref(schedule);
+  import { useFetchJson } from '@/composables/useFetchJson.js';
+
+  const { data: scheduleRef, loading, error } = useFetchJson({url: '/api/schedule/all'});
   const search = ref('');
   const showAll = ref(false);
 
@@ -41,7 +43,7 @@
   <input type="checkbox" v-model="showAll">
   <input type="search" placeholder="Search" v-model="search">
   {{ search }}
-  <ul>
+  <ul v-if="scheduleRef != null">
     <li v-for="entry of scheduleFiltered" :key="entry.id">
       {{ entry.start }} {{  entry.label }}
     </li>

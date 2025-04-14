@@ -9,6 +9,15 @@ export default defineConfig({
     }),
     quasar(),
   ],
+  server: {
+    proxy: {
+      '/api/schedule/': {
+        target: 'https://chabloz.eu/files/horaires/',
+        changeOrigin: true,
+        rewrite: path => path.replace('/api/schedule/', '')
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': '/src',
