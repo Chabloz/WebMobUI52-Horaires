@@ -1,12 +1,14 @@
 <script setup>
   import { ref, computed, watch} from 'vue';
-  // import schedule from '@/data/scheduleIM.json';
-
+  import schedule from '@/data/scheduleIM.json';
   import { useFetchJson } from '@/composables/useFetchJson.js';
 
-  const { data: scheduleRef, loading, error } = useFetchJson({url: '/api/schedule/all'});
+  const scheduleRef = ref(schedule);
   const search = ref('');
   const showAll = ref(false);
+
+
+  const {data, error, loading} = useFetchJson('/api/schedule/all');
 
   const scheduleSorted = computed(() => {
     return scheduleRef.value.sort((a, b) => {
@@ -34,16 +36,15 @@
       return label.includes(searchTerm);
     });
   });
-
-
 </script>
 
 <template>
+  <p v-if="error">{{  error }}</p>
+  <p v-if="loading">Chargement en cours....</p>
   Horaires
   <input type="checkbox" v-model="showAll">
   <input type="search" placeholder="Search" v-model="search">
-  {{ search }}
-  <ul v-if="scheduleRef != null">
+  <ul>
     <li v-for="entry of scheduleFiltered" :key="entry.id">
       {{ entry.start }} {{  entry.label }}
     </li>
