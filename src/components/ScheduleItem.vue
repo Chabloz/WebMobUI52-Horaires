@@ -1,10 +1,17 @@
 <script setup>
-  defineProps({
+  const {entry} = defineProps({
     entry: {
       type: Object,
       required: true
     }
   });
+
+  const emits = defineEmits(['search-course']);
+
+  function onLabelClick() {
+    console.log('Label clicked:', entry.label);
+    emits('search-course', entry.label);
+  }
 
   function formatDate(dateString) {
     const date = new Date(dateString);
@@ -37,7 +44,7 @@
     </q-item-section>
 
     <q-item-section top class="column-divider">
-      <div>{{ entry.label }}</div>
+      <div @click="onLabelClick">{{ entry.label }}</div>
       <div>{{ entry.class }}</div>
     </q-item-section>
 
