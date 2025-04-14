@@ -1,4 +1,7 @@
 <script setup>
+  import { useJsonStorage } from '@/composables/useJsonStorage.js';
+  import { formatDate, formatTime } from '@/utils/dateFr.js';
+
   const {entry} = defineProps({
     entry: {
       type: Object,
@@ -6,29 +9,10 @@
     }
   });
 
-  const emits = defineEmits(['search-course']);
+  const emits = defineEmits(['search-changed']);
 
   function onLabelClick() {
-    console.log('Label clicked:', entry.label);
-    emits('search-course', entry.label);
-  }
-
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    const dayOfWeek = days[date.getDay()];
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-
-    return `${dayOfWeek} ${day}.${month}`;
-  }
-
-  function formatTime(dateString) {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-
-    return `${hours}:${minutes}`;
+    emits('search-changed', entry.label);
   }
 </script>
 
@@ -44,7 +28,7 @@
     </q-item-section>
 
     <q-item-section top class="column-divider">
-      <div @click="onLabelClick">{{ entry.label }}</div>
+      <div class="label" @click="onLabelClick">{{ entry.label }}</div>
       <div>{{ entry.class }}</div>
     </q-item-section>
 
@@ -55,9 +39,13 @@
 </template>
 
 <style scoped>
-.column-divider {
-  border-right: 1px solid rgba(0, 0, 0, 0.12);
-  padding-right: 12px;
-  margin-right: 12px;
-}
+  .column-divider {
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    padding-right: 12px;
+    margin-right: 12px;
+  }
+  div.label {
+    cursor: pointer;
+    color : var(--q-secondary);
+  }
 </style>

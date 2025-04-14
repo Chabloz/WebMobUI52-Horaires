@@ -6,6 +6,7 @@
   import ScheduleItem from '@/components/ScheduleItem.vue';
   import { useJsonStorage } from '@/composables/useJsonStorage.js';
   import { useFetchJson } from '@/composables/useFetchJson.js';
+  import { useQuasar } from 'quasar';
 
   const {data: search} = useJsonStorage('searchTerm', '');
   const {data: selectedClasses} = useJsonStorage('selectedClasses', []);
@@ -45,8 +46,14 @@
     showHistory.value = false;
   }
 
-  function onSearchCourse(course) {
-    search.value = course;
+  const $q = useQuasar();
+  const zebraColor = ref('#f5f5f5');
+  watchEffect(() => {
+    zebraColor.value = $q.dark.isActive ? '#222222' : '#f5f5f5';
+  });
+
+  function changeSearchTerm(label) {
+    search.value = label;
   }
 </script>
 
@@ -76,9 +83,16 @@
           v-for="(entry, ind) of scheduleFiltered"
           :key="entry.id"
           :entry="entry"
-          @search-course="onSearchCourse"
+          :class="ind % 2 === 0 ? 'zebra' : ''"
+          @search-changed="changeSearchTerm($event)"
         />
       </q-list>
     </div>
   </div>
 </template>
+
+<style scoped>
+  .zebra {
+    background-color: v-bind('zebraColor');
+  }
+</style>
