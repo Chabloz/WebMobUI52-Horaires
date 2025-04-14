@@ -46,6 +46,7 @@
   }
   div.label {
     cursor: pointer;
-    color : var(--q-secondary);
+    text-decoration: underline;
+
   }
 </style>
