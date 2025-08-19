@@ -46,7 +46,7 @@ export function fetchJson(options) {
     method = null,
     headers = {},
     timeout = 5000,
-    baseUrl = '',
+    baseUrl = null,
   } = options;
 
   if (typeof url !== 'string') throw new Error('The URL must be a string.');
@@ -102,15 +102,17 @@ export function fetchJson(options) {
       .catch(err => {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-          reject({ status: 0, statusText: 'Request aborted (timeout)', data: null });
+          reject({ status: 408, statusText: 'Request Timeout', data: null });
+        } else if (err === 'AbortExternally') {
+          reject({ status: 499, statusText: 'Client Closed Request', data: null });
         } else {
-          reject({ status: 0, statusText: err.message || 'Network error', data: null });
+          reject({ status: 0, statusText: err.message || 'Unknown Network Error', data: null });
         }
       });
   });
 
   return {
     request,
-    abort: () => controller.abort(),
+    abort: () => controller.abort('AbortExternally'),
   };
 }

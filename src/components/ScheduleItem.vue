@@ -29,7 +29,7 @@
 
     <q-item-section top class="column-divider">
       <div class="label" @click="onLabelClick">{{ entry.label }}</div>
-      <div>{{ entry.class }}</div>
+      <div class="class-name">{{ entry.class }}</div>
     </q-item-section>
 
     <q-item-section top>
@@ -47,6 +47,9 @@
   div.label {
     cursor: pointer;
     text-decoration: underline;
+  }
 
+  .class-name, .label {
+    padding-right: 0.2rem;
   }
 </style>

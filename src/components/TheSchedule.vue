@@ -1,18 +1,33 @@
 <script setup>
-  import { ref, computed, watchEffect, nextTick } from 'vue';
+  import { ref, computed, watchEffect, nextTick, onMounted, onUnmounted } from 'vue';
   import TheClassesSelectors from '@/components/TheClassesSelectors.vue';
   import TheSearchInput from '@/components/TheSearchInput.vue';
   import NetworkError from '@/components/NetworkError.vue';
   import ScheduleItem from '@/components/ScheduleItem.vue';
   import { useJsonStorage } from '@/composables/useJsonStorage.js';
   import { useFetchJson } from '@/composables/useFetchJson.js';
+  import { useOnlineStatus } from '@/composables/useOnlineStatus.js';
   import { useQuasar } from 'quasar';
 
-  const {data: search} = useJsonStorage('searchTerm', '');
-  const {data: selectedClasses} = useJsonStorage('selectedClasses', []);
-  const {data: showHistory} = useJsonStorage('showHistory', false);
+  const { data: search } = useJsonStorage('searchTerm', '');
+  const { data: selectedClasses } = useJsonStorage('selectedClasses', []);
+  const { data: showHistory } = useJsonStorage('showHistory', false);
 
-  const {data: schedule, error, loading, abort} = useFetchJson("/api/schedule/all");
+  const { data: schedule, error, loading, execute: reloadSchedule } = useFetchJson("/api/schedule/all.json");
+  const { onReconnect } = useOnlineStatus();
+
+  onReconnect(() => reloadSchedule());
+
+  function handleVisibilityChange() {
+    if (!document.hidden) reloadSchedule();
+  }
+  onMounted(() => {
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+  });
+
+  onUnmounted(() => {
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  });
 
   const scheduleSorted = computed(() => {
     if (!schedule.value) return [];
@@ -59,9 +74,9 @@
 
 <template>
   <div>
-    <q-inner-loading :showing="loading">
+    <!-- <q-inner-loading :showing="loading">
       <q-spinner-gears size="50px" color="primary" />
-    </q-inner-loading>
+    </q-inner-loading> -->
 
     <NetworkError v-if="error" />
 
@@ -73,7 +88,9 @@
 
       <div class="flex justify-between">
         <q-checkbox v-model="showHistory" label="Afficher l'historique" dense/>
-        <q-btn @click="resetAll" icon="restart_alt" label="Vider les filtres" dense flat />
+        <div class="q-gutter-sm">
+          <q-btn @click="resetAll" icon="restart_alt" label="Vider les filtres" dense flat />
+        </div>
       </div>
 
       <TheSearchInput v-model="search" />

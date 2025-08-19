@@ -2,8 +2,6 @@
   import TheHeader from '@/components/TheHeader.vue';
   import TheFooter from '@/components/TheFooter.vue';
   import TheSchedule from '@/components/TheSchedule.vue';
-
-  fetch('/api/schedule/all');
 </script>
 
 <template>
