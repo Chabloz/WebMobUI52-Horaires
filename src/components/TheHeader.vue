@@ -2,13 +2,35 @@
 import { onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { useJsonStorage } from '@/composables/useJsonStorage.js';
+import { usePWAInstall } from '@/composables/usePWAInstall.js';
 
 const $q = useQuasar();
 const {data: isDark} = useJsonStorage('isDark', null);
+const { canInstall, isInstalled, installPWA } = usePWAInstall();
 
 function toggleDarkMode() {
   isDark.value = !isDark.value;
   $q.dark.set(isDark.value);
+}
+
+async function handleInstall() {
+  const result = await installPWA();
+
+  if (result.success) {
+    $q.notify({
+      message: 'Application installée avec succès!',
+      color: 'positive',
+      icon: 'download_done',
+      timeout: 3000
+    });
+  } else if (result.outcome === 'dismissed') {
+    $q.notify({
+      message: 'Installation annulée',
+      color: 'info',
+      icon: 'info',
+      timeout: 2000
+    });
+  }
 }
 
 onMounted(() => {
@@ -28,6 +50,16 @@ onMounted(() => {
           </q-avatar>
           IM - Horaires
         </q-toolbar-title>
+
+        <q-btn
+          v-if="canInstall && !isInstalled"
+          @click="handleInstall"
+          flat
+          round
+          icon="download"
+          aria-label="Installer l'application"
+          class="q-mr-sm"
+        />
 
         <q-btn
           flat
