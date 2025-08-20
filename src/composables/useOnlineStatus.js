@@ -12,7 +12,6 @@ export function useOnlineStatus() {
     const wasOffline = !isOnline.value;
     isOnline.value = navigator.onLine;
 
-    // If we just came back online, execute reconnect callbacks
     if (wasOffline && isOnline.value) {
       reconnectCallbacks.forEach(callback => {
         try {
