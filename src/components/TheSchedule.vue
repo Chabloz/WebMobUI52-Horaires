@@ -21,6 +21,7 @@
   function handleVisibilityChange() {
     if (!document.hidden) reloadSchedule();
   }
+
   onMounted(() => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
   });
@@ -74,10 +75,6 @@
 
 <template>
   <div>
-    <!-- <q-inner-loading :showing="loading">
-      <q-spinner-gears size="50px" color="primary" />
-    </q-inner-loading> -->
-
     <NetworkError v-if="error" />
 
     <div v-if="schedule != null" class="q-pa-md">
