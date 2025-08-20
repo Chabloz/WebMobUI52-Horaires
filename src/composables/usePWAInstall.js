@@ -1,6 +1,5 @@
 import { ref, onMounted } from 'vue';
 
-
 export function usePWAInstall() {
   const canInstall = ref(false);
   const isInstalled = ref(false);

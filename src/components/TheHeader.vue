@@ -13,26 +13,6 @@ function toggleDarkMode() {
   $q.dark.set(isDark.value);
 }
 
-async function handleInstall() {
-  const result = await installPWA();
-
-  if (result.success) {
-    $q.notify({
-      message: 'Application installée avec succès!',
-      color: 'positive',
-      icon: 'download_done',
-      timeout: 3000
-    });
-  } else if (result.outcome === 'dismissed') {
-    $q.notify({
-      message: 'Installation annulée',
-      color: 'info',
-      icon: 'info',
-      timeout: 2000
-    });
-  }
-}
-
 onMounted(() => {
   if (isDark.value === null) {
     isDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -53,7 +33,7 @@ onMounted(() => {
 
         <q-btn
           v-if="canInstall && !isInstalled"
-          @click="handleInstall"
+          @click="installPWA"
           flat
           round
           icon="download"
