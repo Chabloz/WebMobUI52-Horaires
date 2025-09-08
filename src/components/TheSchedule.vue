@@ -8,12 +8,13 @@
   import { useFetchJson } from '@/composables/useFetchJson.js';
   import { useOnlineStatus } from '@/composables/useOnlineStatus.js';
   import { useQuasar } from 'quasar';
+  import { textIncludes } from '@/utils/textUtils.js';
 
   const { data: search } = useJsonStorage('searchTerm', '');
   const { data: selectedClasses } = useJsonStorage('selectedClasses', []);
   const { data: showHistory } = useJsonStorage('showHistory', false);
 
-  const { data: schedule, error, loading, execute: reloadSchedule } = useFetchJson("/api/schedule/all.json");
+  const { data: schedule, error, execute: reloadSchedule } = useFetchJson("/api/schedule/all.json");
   const { onReconnect } = useOnlineStatus();
 
   onReconnect(() => reloadSchedule());
@@ -44,14 +45,10 @@
   const scheduleFiltered = computed(() => {
     let filtered = scheduleAfter.value;
     if (selectedClasses.value.length > 0) {
-      filtered = scheduleAfter.value.filter(entry => {
-        return selectedClasses.value.includes(entry.class);
-      });
+      filtered = filtered.filter(entry => selectedClasses.value.includes(entry.class));
     }
     if (search.value) {
-      filtered = filtered.filter(entry => {
-        return entry.label.toLowerCase().includes(search.value.toLowerCase());
-      });
+      filtered = filtered.filter(entry => textIncludes(entry.label, search.value));
     }
     return filtered;
   });

@@ -4,7 +4,7 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  base: '/schedule/',
+  base: '/',
   plugins: [
     vue({
       template: { transformAssetUrls }
