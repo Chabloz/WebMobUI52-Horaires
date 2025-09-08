@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, computed, watchEffect, nextTick, onMounted, onUnmounted } from 'vue';
+  import { ref, computed, watchEffect, onMounted, onUnmounted } from 'vue';
   import TheClassesSelectors from '@/components/TheClassesSelectors.vue';
   import TheSearchInput from '@/components/TheSearchInput.vue';
   import NetworkError from '@/components/NetworkError.vue';

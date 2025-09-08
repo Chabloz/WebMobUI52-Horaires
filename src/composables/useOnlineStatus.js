@@ -1,9 +1,5 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
-/**
- * Simple composable to track online/offline state
- * @returns {Object} - { isOnline, onReconnect }
- */
 export function useOnlineStatus() {
   const isOnline = ref(navigator.onLine);
   const reconnectCallbacks = [];
@@ -14,9 +10,7 @@ export function useOnlineStatus() {
 
     if (wasOffline && isOnline.value) {
       reconnectCallbacks.forEach(callback => {
-        try {
-          callback();
-        } catch (error) {
+        try { callback() } catch (error) {
           console.warn('Error in reconnect callback:', error);
         }
       });
@@ -24,9 +18,7 @@ export function useOnlineStatus() {
   }
 
   function onReconnect(callback) {
-    if (typeof callback === 'function') {
-      reconnectCallbacks.push(callback);
-    }
+    reconnectCallbacks.push(callback);
   }
 
   onMounted(() => {
