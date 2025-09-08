@@ -7,6 +7,6 @@
     dense
     filled
     v-model="model"
-    placeholder="Search"
+    placeholder="Filtrer par cours"
   />
 </template>
